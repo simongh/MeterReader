@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
 namespace MeterReader
 {
@@ -18,15 +19,17 @@ namespace MeterReader
             services.AddDbContext<Services.DataContext>(options =>
              {
                  options.UseSqlite(configuration.GetConnectionString("meterreader"));
-             }, ServiceLifetime.Transient, ServiceLifetime.Singleton);
+             }, contextLifetime: ServiceLifetime.Transient, optionsLifetime: ServiceLifetime.Singleton);
 
             return services;
         }
 
-        private static void HttpClientHelper(HttpClient client)
+        private static void HttpClientHelper(IServiceProvider serviceProvider, HttpClient client)
         {
-            client.BaseAddress = new Uri("https://api.glowmarkt.com/api/v0-1/");
-            client.DefaultRequestHeaders.Add("applicationId", "b0f1b774-a586-4f72-9edd-27ead8aa7a8d");
+            var options = serviceProvider.GetRequiredService<IOptions<Types.Options>>().Value;
+
+            client.BaseAddress = new Uri(options.Url);
+            client.DefaultRequestHeaders.Add("applicationId", options.ApplicationId);
         }
     }
 }

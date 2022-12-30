@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace MeterReader.Commands
 {
@@ -14,13 +15,16 @@ namespace MeterReader.Commands
     {
         private readonly Services.IDataContext _dataContext;
         private readonly Services.IHttpService _httpService;
+        private readonly Types.Options _options;
 
         public GetReadingsCommandHandler(
             Services.IDataContext dataContext,
-            Services.IHttpService httpService)
+            Services.IHttpService httpService,
+            IOptions<Types.Options> options)
         {
             _dataContext = dataContext;
             _httpService = httpService;
+            _options = options.Value;
         }
 
         protected override async Task Handle(GetReadingsCommand request, CancellationToken cancellationToken)
@@ -42,6 +46,7 @@ namespace MeterReader.Commands
                     From = request.From,
                     To = request.To,
                     Id = item,
+                    Interval = _options.Interval,
                 };
 
                 var data = await _httpService.GetReadingsAsync(filter);

@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using System.Text.Json;
 
 namespace MeterReader.Services
@@ -8,16 +7,13 @@ namespace MeterReader.Services
     {
         private readonly HttpClient _client;
         private readonly ILogger<HttpService> _log;
-        private readonly Types.Options _options;
 
         public HttpService(
             HttpClient client,
-            IOptions<Types.Options> options,
             ILogger<HttpService> log)
         {
             _client = client;
             _log = log;
-            _options = options.Value;
         }
 
         public async Task<string> GetVirtualEntitiesAsync()
