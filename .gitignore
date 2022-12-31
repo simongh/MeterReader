@@ -364,3 +364,4 @@ FodyWeavers.xsd
 
 # Custom
 /MeterReader/appsettings.*.json
+/data

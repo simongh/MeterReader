@@ -23,14 +23,14 @@ namespace MeterReader
             await mediator.Send(new Commands.FindResourcesCommand());
             var d = await mediator.Send(new Commands.StartQuery());
 
+            if (!DateTimeOffset.TryParse(Environment.GetEnvironmentVariable("enddate"), out var enddate))
+                enddate = DateTimeOffset.UtcNow;
+
             await mediator.Send(new Commands.GetReadingsCommand
             {
                 From = d,
-                //From = DateTimeOffset.UtcNow.Date,
-                To = DateTimeOffset.UtcNow,
+                To = enddate,
             });
-
-            //await host.RunAsync();
         }
 
         private static void ApplyMigrations(IServiceProvider app)
