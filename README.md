@@ -37,13 +37,19 @@ The app will create the database if it doesn't exist and the schema. Next it wil
 
 If it can't find any resource settings, it will look attempt to discover them by looking up the first virtual entity & then retrieving the resource ids for gas consumption & electricity consumption. These ids are then stored in the database for the next time.
 
-Next it will look in the readings table for the last recorded reading. If it can't find any, it'll use the settings to determine a start date. By default this is the current UTC time minus 1 day. You can override this by setting the environment variable:
+Next it will look in the readings table for the last recorded reading. If it can't find any, it'll use the settings to determine a start date. By default this is the current UTC time minus 2 days. You can override this by setting the environment variable:
 
 ```
-config__startDate=yyyy-MM-dd HH:mm:ss
+startDate=yyyy-MM-dd HH:mm:ss
 ```
 
 Readings are retrieved using an interval. By default this is per day, but can be overrriden. Refer to the [API documentation](https://docs.glowmarkt.com/GlowmarktAPIDataRetrievalDocumentationIndividualUserForBright.pdf) to find valid values. The end date defaults to now. To override this, set the environment variable `enddate` as yyyy-MM-dd HH:mm:ss.
+
+If you're having probelms with the responses from the API, you can view the full response in the log by changing the log level
+
+```
+logging__loglevel__default=Debug
+```
 
 #Building
 It's a standard dotnet 6 app. Use `dotnet build`

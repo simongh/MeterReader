@@ -1,6 +1,6 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Configuration;
 
 namespace MeterReader.Commands
 {
@@ -11,18 +11,23 @@ namespace MeterReader.Commands
     internal class StartQueryHandler : IRequestHandler<StartQuery, DateTimeOffset>
     {
         private readonly Services.IDataContext _dataContext;
-        private readonly Types.Options _options;
+        private readonly IConfiguration _configuration;
 
         public StartQueryHandler(
             Services.IDataContext dataContext,
-            IOptions<Types.Options> options)
+            IConfiguration configuration)
         {
             _dataContext = dataContext;
-            _options = options.Value;
+            _configuration = configuration;
         }
 
         public async Task<DateTimeOffset> Handle(StartQuery request, CancellationToken cancellationToken)
         {
+            var startDate = _configuration.GetValue<DateTimeOffset?>("startdate");
+
+            if (startDate.HasValue)
+                return startDate.Value;
+
             var latest = await _dataContext.Readings
                 .OrderByDescending(r => r.Created)
                 .Take(1)
@@ -30,7 +35,7 @@ namespace MeterReader.Commands
                 .FirstOrDefaultAsync();
 
             if (latest == default)
-                latest = _options.StartDate;
+                latest = DateTimeOffset.UtcNow.AddDays(-2);
 
             return latest;
         }

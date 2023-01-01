@@ -6,8 +6,6 @@
 
         public string Password { get; set; } = null!;
 
-        public DateTimeOffset StartDate { get; set; } = DateTimeOffset.UtcNow.Date.AddDays(-1);
-
         public string Interval { get; set; } = "P1D";
 
         public string Url { get; set; } = "https://api.glowmarkt.com/api/v0-1/";

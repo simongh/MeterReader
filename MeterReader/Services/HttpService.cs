@@ -56,7 +56,7 @@ namespace MeterReader.Services
         {
             var jdoc = JsonDocument.Parse(await _client.GetStreamAsync($"resource/{filter.Id}/readings?{filter}"));
 
-            _log.LogInformation("response: {response}", jdoc.RootElement);
+            _log.LogDebug("response: {response}", jdoc.RootElement);
 
             var classifier = jdoc.RootElement
                 .GetProperty("classifier")

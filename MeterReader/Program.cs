@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -21,15 +22,15 @@ namespace MeterReader
 
             var mediator = host.Services.GetRequiredService<IMediator>();
             await mediator.Send(new Commands.FindResourcesCommand());
-            var d = await mediator.Send(new Commands.StartQuery());
+            var startDate = await mediator.Send(new Commands.StartQuery());
 
-            if (!DateTimeOffset.TryParse(Environment.GetEnvironmentVariable("enddate"), out var enddate))
-                enddate = DateTimeOffset.UtcNow;
+            var config = host.Services.GetRequiredService<IConfiguration>();
+            var endDate = config.GetValue<DateTimeOffset?>("enddate") ?? DateTimeOffset.UtcNow;
 
             await mediator.Send(new Commands.GetReadingsCommand
             {
-                From = d,
-                To = enddate,
+                From = startDate,
+                To = endDate,
             });
         }
 

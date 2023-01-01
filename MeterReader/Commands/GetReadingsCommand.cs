@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace MeterReader.Commands
@@ -15,15 +16,18 @@ namespace MeterReader.Commands
     {
         private readonly Services.IDataContext _dataContext;
         private readonly Services.IHttpService _httpService;
+        private readonly ILogger<GetReadingsCommandHandler> _log;
         private readonly Types.Options _options;
 
         public GetReadingsCommandHandler(
             Services.IDataContext dataContext,
             Services.IHttpService httpService,
-            IOptions<Types.Options> options)
+            IOptions<Types.Options> options,
+            ILogger<GetReadingsCommandHandler> log)
         {
             _dataContext = dataContext;
             _httpService = httpService;
+            _log = log;
             _options = options.Value;
         }
 
@@ -38,6 +42,8 @@ namespace MeterReader.Commands
             {
                 throw new ApplicationException("Unable to find any resource IDs. Make sure they have been discovered, or set manually");
             }
+
+            _log.LogInformation("Collecting reading from {startDate:o} to {endDate:o} with {interval}", request.From, request.To, _options.Interval);
 
             foreach (var item in resources)
             {
